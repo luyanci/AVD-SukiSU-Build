@@ -56,7 +56,7 @@ jobs:
       - name: Build kernel
         run: |
           cd $GITHUB_WORKSPACE/android-kernel
-          ./tools/bazel run --verbose_failures --jobs=8 --make_jobs=8 --config=android_ci --profile=target/logs/command.profile.json //common-modules/virtual-device:virtual_device_x86_64_dist -- --dist_dir=target --flat
+          ./tools/bazel run --verbose_failures --jobs=$(nproc --all) --make_jobs=$(nproc --all) --config=android_ci --profile=target/logs/command.profile.json //common-modules/virtual-device:virtual_device_x86_64_dist -- --dist_dir=target --flat
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
