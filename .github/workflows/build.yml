@@ -1,0 +1,65 @@
+name: Build KernelSU Next
+on:
+  workflow_dispatch:
+    inputs:
+      KERNEL_VERSION:
+        description: "内核版本"
+        required: true
+        default: 'common-android15-6.6-2025-02'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 8192
+          temp-reserve-mb: 2048
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - uses: actions/checkout@v4
+        with:
+          path: build
+          fetch-depth: 0
+
+      - name: Install repo tool
+        run: |
+         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
+         chmod a+x ~/repo
+         sudo mv ~/repo /usr/local/bin/repo
+
+      - name: Setup kernel source
+        run: |
+          echo "Free space:"
+          df -h
+          cd $GITHUB_WORKSPACE
+          mkdir android-kernel && cd android-kernel
+          wget https://android.googlesource.com/kernel/manifest/+/refs/heads/${{ inputs.KERNEL_VERSION }}/default.xml
+          repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -m default.xml
+          repo --version
+          repo --trace sync -c -j$(nproc --all) --no-tags
+          df -h
+
+      - name: Setup KernelSU-Next
+        run: |
+          cd $GITHUB_WORKSPACE/android-kernel
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+          mkdir target
+          mkdir target/logs
+
+      - name: Build kernel
+        working-directory: android-kernel
+        run: |
+          cd $GITHUB_WORKSPACE/android-kernel
+          ./tools/bazel run --verbose_failures --jobs=8 --make_jobs=8 --config=android_ci --profile=target/logs/command.profile.json //common-modules/virtual-device:virtual_device_x86_64_dist -- --dist_dir=target --flat
+
+      - name: Upload Kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-avd-${{ inputs.KERNEL_VERSION }}
+          path: "$GITHUB_WORKSPACE/android-kernel/target/bzImage"
