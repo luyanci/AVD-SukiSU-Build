@@ -48,12 +48,12 @@ jobs:
       - name: Setup KernelSU-Next
         run: |
           cd $GITHUB_WORKSPACE/android-kernel
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
           mkdir target
           mkdir target/logs
+          sed -i 's/-DKSU_VERSION=11998/-DKSU_VERSION=12816/g' KernelSU-Next/kernel/Makefile
 
       - name: Build kernel
-        working-directory: android-kernel
         run: |
           cd $GITHUB_WORKSPACE/android-kernel
           ./tools/bazel run --verbose_failures --jobs=8 --make_jobs=8 --config=android_ci --profile=target/logs/command.profile.json //common-modules/virtual-device:virtual_device_x86_64_dist -- --dist_dir=target --flat
