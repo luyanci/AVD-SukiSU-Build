@@ -1,4 +1,4 @@
-name: Build KernelSU Next
+name: Build KernelSU Next AARCH64
 on:
   workflow_dispatch:
     inputs:
