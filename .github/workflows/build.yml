@@ -40,7 +40,8 @@ jobs:
           cd $GITHUB_WORKSPACE
           mkdir android-kernel && cd android-kernel
           wget https://android.googlesource.com/kernel/manifest/+/refs/heads/${{ inputs.KERNEL_VERSION }}/default.xml
-          repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -m default.xml
+          # repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -m default.xml
+          repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b ${{ inputs.KERNEL_VERSION }}
           repo --version
           repo --trace sync -c -j$(nproc --all) --no-tags
           df -h
