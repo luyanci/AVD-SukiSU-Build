@@ -49,6 +49,7 @@ jobs:
       - name: Build kernel
         run: |
           ./tools/bazel run --verbose_failures --jobs=$(nproc --all) --make_jobs=$(nproc --all) --config=android_ci --profile=target/logs/command.profile.json //common:kernel_aarch64_abi_dist -- --dist_dir=target --flat
+          ls -alh target
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
