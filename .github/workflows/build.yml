@@ -22,11 +22,6 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
 
-      - uses: actions/checkout@v4
-        with:
-          path: build
-          fetch-depth: 0
-
       - name: Install repo tool
         run: |
          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
@@ -37,9 +32,7 @@ jobs:
         run: |
           echo "Free space:"
           df -h
-          cd $GITHUB_WORKSPACE
-          mkdir android-kernel && cd android-kernel
-          wget https://android.googlesource.com/kernel/manifest/+/refs/heads/${{ inputs.KERNEL_VERSION }}/default.xml
+          # wget https://android.googlesource.com/kernel/manifest/+/refs/heads/${{ inputs.KERNEL_VERSION }}/default.xml
           # repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -m default.xml
           repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b ${{ inputs.KERNEL_VERSION }}
           repo --version
@@ -48,7 +41,6 @@ jobs:
 
       - name: Setup KernelSU-Next
         run: |
-          cd $GITHUB_WORKSPACE/android-kernel
           curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
           mkdir target
           mkdir target/logs
@@ -56,11 +48,10 @@ jobs:
 
       - name: Build kernel
         run: |
-          cd $GITHUB_WORKSPACE/android-kernel
           ./tools/bazel run --verbose_failures --jobs=$(nproc --all) --make_jobs=$(nproc --all) --config=android_ci --profile=target/logs/command.profile.json //common-modules/virtual-device:virtual_device_x86_64_dist -- --dist_dir=target --flat
 
       - name: Upload Kernel
         uses: actions/upload-artifact@v4
         with:
           name: kernel-avd-${{ inputs.KERNEL_VERSION }}
-          path: "$GITHUB_WORKSPACE/android-kernel/target/bzImage"
+          path: "target/bzImage"
