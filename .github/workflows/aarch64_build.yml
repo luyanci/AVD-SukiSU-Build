@@ -54,4 +54,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kernel-avd-${{ inputs.KERNEL_VERSION }}
-          path: "target/bzImage"
+          path: "target/Image.gz"
