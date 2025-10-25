@@ -47,12 +47,12 @@ jobs:
           wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/refs/heads/main/setup.sh | bash
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' common/security/Kconfig
 
-      - name: Setup SukiSU
-        run: |
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s main
-          mkdir target
-          mkdir target/logs
-          # sed -i 's/-DKSU_VERSION=11998/-DKSU_VERSION=12816/g' KernelSU/kernel/Makefile
+      # - name: Setup SukiSU
+      #   run: |
+      #     curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s main
+      #     mkdir target
+      #     mkdir target/logs
+      #     # sed -i 's/-DKSU_VERSION=11998/-DKSU_VERSION=12816/g' KernelSU/kernel/Makefile
 
       - name: Build kernel
         run: |
