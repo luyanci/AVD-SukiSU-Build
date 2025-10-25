@@ -43,7 +43,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd "$CONFIG"
           echo "Adding BBG..."
           wget -O- https://github.com/AlexLiuDev233/Baseband-guard/raw/refs/heads/test/setup.sh | bash -s bbb-test
           echo "CONFIG_BBG=y" >> common/arch/arm64/configs/gki_defconfig
