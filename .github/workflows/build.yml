@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Adding BBG..."
-          wget -O- https://github.com/AlexLiuDev233/Baseband-guard/raw/refs/heads/test/setup.sh | bash -s bbb-test
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/refs/heads/main/setup.sh | bash
           echo "CONFIG_BBG=y" >> common/arch/arm64/configs/gki_defconfig
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' common/security/Kconfig
 
