@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       KERNEL_VERSION:
-        description: "内核版本"
+        description: "Kernel version (default: common-android15-6.6-2025-02)"
         required: true
-        default: 'common-android15-6.6-2025-02'
+        default: "common-android15-6.6-2025-02"
 
 jobs:
   build:
@@ -17,16 +17,16 @@ jobs:
         with:
           root-reserve-mb: 8192
           temp-reserve-mb: 2048
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
+          remove-dotnet: "true"
+          remove-android: "true"
+          remove-haskell: "true"
+          remove-codeql: "true"
 
       - name: Install repo tool
         run: |
-         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
-         chmod a+x ~/repo
-         sudo mv ~/repo /usr/local/bin/repo
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/repo
+          chmod a+x ~/repo
+          sudo mv ~/repo /usr/local/bin/repo
 
       - name: Setup kernel source
         run: |
@@ -39,12 +39,22 @@ jobs:
           repo --trace sync -c -j$(nproc --all) --no-tags
           df -h
 
-      - name: Setup KernelSU-Next
+      - name: Add BBG
+        shell: bash
         run: |
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -
+          set -euo pipefail
+          cd "$CONFIG"
+          echo "Adding BBG..."
+          wget -O- https://github.com/AlexLiuDev233/Baseband-guard/raw/refs/heads/test/setup.sh | bash -s bbb-test
+          echo "CONFIG_BBG=y" >> common/arch/arm64/configs/gki_defconfig
+          sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' common/security/Kconfig
+
+      - name: Setup SukiSU
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s main
           mkdir target
           mkdir target/logs
-          sed -i 's/-DKSU_VERSION=11998/-DKSU_VERSION=12816/g' KernelSU-Next/kernel/Makefile
+          # sed -i 's/-DKSU_VERSION=11998/-DKSU_VERSION=12816/g' KernelSU/kernel/Makefile
 
       - name: Build kernel
         run: |
