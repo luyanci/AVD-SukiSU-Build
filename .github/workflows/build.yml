@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Adding BBG..."
-          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/refs/heads/main/setup.sh | bash
+          wget -O- https://github.com/luyanci/Baseband-guard/raw/refs/heads/main/setup.sh | bash
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' common/security/Kconfig
 
       # - name: Setup SukiSU
